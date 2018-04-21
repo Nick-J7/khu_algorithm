@@ -1,3 +1,5 @@
+import pdb
+
 import numpy as np
 
 V = ['a', 'b', 'c', 'd', 'e', 'f']
@@ -58,47 +60,98 @@ def my_prim():
             min_cost += min_dist
             spanning_tree_edge_list.append(min_edge)
 
-    print(min_cost)
+    print("min_cost: ", min_cost)
     print(spanning_tree_edge_list)
 
 
 def prim():
-    n = 6
-    F = set()
+    n = len(V) 
+    V_set = set(range(n))
+    Y_set = set([0])
+    F_set = set()
     min_cost = 0
-    nearest = np.zeros(n, dtype=np.int32)
-    distance = np.zeros(n, dtype=np.float32)
 
-    # Start node = 0
-    for i in range(1, n):
+    # nearest vertex in Y of each vertex involved in V - Y
+    nearest = np.zeros([n], dtype=np.int32) 
+    # nearest distacne to Y of each vertex involved in V - Y
+    distance = np.zeros([n]) 
+
+    # Start node is 0
+    for i in range(n):
         nearest[i] = 0
-        distance[i] = W[0][i]
+        distance[i] = W[i][0] 
+    distance[0] = -1
 
-    # Add (n-1) edge
+    # Repeat n-1
     for i in range(n-1):
-        # Find minimum distance
-        min_dist = np.inf
+
+        # Find nearest node involved in V - Y
         near_node = None
-        for j in range(1, n):
-            if 0 <= distance[j] < min_dist:
-                min_dist = distance[j]
-                near_node = j
+        min_dist = np.inf 
+        for node in (V_set - Y_set):
+            if 0 <= distance[node] < min_dist:
+                min_dist = distance[node]
+                near_node = node
 
-        F.add((nearest[near_node], near_node))
-        min_cost += min_dist
+        if near_node is None:
+            print("Graph is not connected.")
+            return
+
+        # Add near_node to Y
+        min_cost += distance[near_node]
+        Y_set.add(near_node)
+        F_set.add((nearest[near_node], near_node))
         distance[near_node] = -1
-        for j in range(1, n):
-            if W[j][near_node] < distance[j]:
-                distance[j] = W[j][near_node]
-                nearest[j] = near_node
 
+        # Update nearest, distance
+        for node in (V_set - Y_set):
+            if W[near_node][node] < distance[node]:
+                distance[node] = W[near_node][node]
+                nearest[node] = near_node
+
+    print("min_cost: ", min_cost)
+    print(F_set)
+
+
+def kruskal():
+    n = len(V)
+    min_cost = 0
+    F = []
+    
+    sorted_edge = sorted(E, key=lambda x: x[2])
+    set_list = [set([i]) for i in V]
+
+    def find_set_index(node):
+        for index, each_set in enumerate(set_list):
+            if node in each_set:
+                return index
+        return -1
+
+    # Repeat n - 1
+    while len(F) < n-1:
+        min_edge = sorted_edge[0] 
+        start_node = min_edge[0] 
+        end_node = min_edge[1] 
+        
+        start_set_index = find_set_index(start_node)
+        end_set_index = find_set_index(end_node)
+
+        if start_set_index != end_set_index:
+            set_list[start_set_index] = \
+                    set_list[start_set_index] | set_list[end_set_index]
+            del set_list[end_set_index]
+            F.append(min_edge) 
+            min_cost += min_edge[2]
+        del sorted_edge[0]
+
+    print("min_cost: ", min_cost)
     print(F)
-    print(min_cost)
 
 
 if __name__ == '__main__':
-    my_prim() # slow
+    print("-- my_prim --")
+    my_prim() 
+    print("-- prim -- ")
     prim()
-
-
-
+    print("-- kruskal --")
+    kruskal()
