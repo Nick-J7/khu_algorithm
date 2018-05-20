@@ -1,12 +1,9 @@
 import pdb
 
-
 def promising(index, weights, target_weight, cur_weight, total_of_remain):
     if cur_weight + total_of_remain < target_weight:
         return False
-    if cur_weight == target_weight:
-        return True
-    if cur_weight + weights[index + 1] > target_weight:
+    if (cur_weight != target_weight) and cur_weight + weights[index + 1] > target_weight:
         return False
     return True
 
@@ -19,7 +16,7 @@ def solve(index, weights, target_weight, items, cur_weight, total_of_remain):
     if promising(index, weights, target_weight, cur_weight, total_of_remain):
         if cur_weight == target_weight:
             print('weights: ', weights)
-            print('teims: ', items)
+            print('items: ', items)
         else:
             # if choose this index item
             solve(index + 1,
@@ -39,20 +36,18 @@ def solve(index, weights, target_weight, items, cur_weight, total_of_remain):
 
 
 if __name__ == '__main__':
-    # weights = [3, 4, 5, 7]
-    # weights = sorted(weights)
-    # items = []
-    # cur_weight = 0
-    # target_weight = 13
-    # total_of_remain = sum(weights)
-    #
-    # solve(index=-1, weights=weights, target_weight=target_weight,
-    #       items=items, cur_weight=cur_weight, total_of_remain=total_of_remain)
+    weights = [3, 4, 5, 6]
+    weights = sorted(weights)
+    items = []
+    cur_weight = 0
+    target_weight = 13
+    total_of_remain = sum(weights)
 
+    solve(index=-1, weights=weights, target_weight=target_weight,
+       items=items, cur_weight=cur_weight, total_of_remain=total_of_remain)
 
+    """
     def promising2(i,weight, total):
-        if i == 3:
-            #pdb.set_trace()
         return ((weight+total >= W) and (weight == W or weight+w[i+1] <=W))
 
     def s_s(i, weight, total, include):
@@ -74,3 +69,4 @@ if __name__ == '__main__':
     for k in w:
         total+=k
     s_s(-1,0,total,include)
+    """
